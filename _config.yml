@@ -4,3 +4,4 @@ description: chronicling my adventures in learning
 url: "http://oddlyaware.github.io"
 markdown: GFM
 highlighter: rouge
+permalink: /blog/:year/:month/:day/:title
