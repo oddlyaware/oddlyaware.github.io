@@ -2,5 +2,5 @@
 name: Define the Odds
 description: chronicling my adventures in learning
 url: "http://oddlyaware.github.io"
-markdown: kramdown
+markdown: GFM
 highlighter: rouge
