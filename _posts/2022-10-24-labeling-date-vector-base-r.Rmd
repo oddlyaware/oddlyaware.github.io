@@ -1,0 +1,196 @@
+---
+title: "Label month, week, or quarter of a date vector using base R functions"
+author: "Grace Byrne"
+date: 2022-10-24
+output: 
+  html_notebook: 
+    theme: spacelab
+    highlight: espresso
+    toc: yes
+    toc_depth: 5
+    # toc_float: true #for table of contents to float on left side.
+    # number_sections: yes
+---
+
+------------------------------------------------------------------------
+
+**Use base R functions to label a date vector**  
+
+Suppose you want to label a date vector with their relevant month, day of week, quarter, or days since a certain date (for example deadlines), how will you go about doing this?
+
+from this:
+```{r, echo = FALSE}
+a <- as.Date(c("1950-11-12", "1980-04-30", "2010-08-22", "2029-07-01"))
+a
+```
+
+
+to this:
+```{r, echo = FALSE}
+names(a) <- paste(quarters(a), weekdays(a, abbreviate = TRUE), months(a, abbreviate = TRUE), sep = "|")
+
+a
+```
+
+or just day of week:
+```{r, echo = FALSE}
+a001 <- a
+names(a001) <- weekdays(a)
+
+a001
+```
+</br>
+***
+</br>  
+First create a date vector:
+```{r}
+a1 <- c("1969-09-26", "1970-05-08")
+```
+</br>
+check it out:
+```{r}
+a1
+```
+
+#### label the vector 
+we can create vector `v1` to name vector `a01`:
+```{r}
+a01 <- a1
+v1 <- c("the start", "the end")
+names(a01) <- v1
+a01
+```
+or not create a separate vector:
+```{r}
+a0 <- a1
+names(a0) <- c("birthdate", 007)
+a0
+```
+what happens if we name it with a vector of a different length?
+```{r}
+a02 <- a1
+names(a02) <- c(5:7) 
+a02
+```
+you get told off!
+***
+## using dates
+let's try to name this using months!
+
+```{r}
+names(a1) <- months(a1)
+```
+seems that we didn't actually create a date vector! Double check:
+```{r}
+class(a1)
+```
+***
+#### convert vector to date
+```{r}
+a2 <- as.Date(a1)
+```
+print & check class:
+```{r}
+a2
+class(a2)
+```
+## Labeling by date {.tabset}
+
+### label by month
+```{r}
+names(a2) <- months(a2)
+a2
+```
+
+### label by week
+
+```{r}
+a3 <- a2
+names(a3) <- weekdays(a3)
+a3
+```
+
+### label by year?
+
+```{r}
+a4 <- a2
+names(a4) <- years(a4)
+a4
+```
+We get an error, as there is no year function in [R base function for time (POSIXt or Date Object)](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/weekdays). We will get to this later. For now, let's focus on what we do have: `weekdays`, `months`, `quarters`, & `julian` (returns numbers of days since the origin).
+
+### name by quarters
+
+```{r}
+a5 <- a2
+names(a5) <- quarters(a5)
+a5
+```
+
+### "julian" - calculate days since
+
+```{r}
+a6 <- a2
+names(a6) <- julian(a6)
+a6
+```
+
+#### what is the origin date here?
+
+```{r}
+?as.POSIXct
+```
+
+typing the above gives R documentation for a base function, which notes that the origin date in R is '1970-01-01 00:00.00 UTC'. [ref](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/ISOdatetime)
+
+Can we specify the origin when getting days-since?
+
+```{r}
+a7 <- a2
+names(a7) <- julian(a7, origin = as.Date("1900-01-01"))
+a7
+```
+
+note that we cannot change the default origin, but must specify when using. Let's see what happens when we don't specify:
+
+```{r}
+a8 <- a7
+names(a8) <- julian(a8)
+a8
+```
+
+can we combine the names?
+
+```{r}
+a9 <- a2
+names(a9) <- paste(months(a9),weekdays(a9), quarters(a9), sep = "/") #default separator is blank space
+a9
+```
+
+this seems rather long, can we abbreviate it?
+
+```{r}
+a10 <- a2
+names(a10) <- paste(months(a9, abbreviate = TRUE), weekdays(a9, abbreviate = TRUE), quarters(a9), sep = "-") #as default abbreviate is set to FALSE
+a10
+```
+
+I didn't abbreviate quarters as it can't get shorter. Note that I just reused a9. Using a vector for labelling does not change the vector itself, as you can see below:
+
+```{r}
+a9
+```
+
+if I `names(a9)` anew, the new name will overwrite previous name.
+
+### Label with year
+To extract the year as a label, we can first extract the year using `format()`, & then label the vector.
+```{r}
+a11 <- a2
+v11 <- format(a2, format="%Y")
+
+names(a11) <- v11
+a11
+```
+
+Et voila. A small exercise. What else can you do with this?
